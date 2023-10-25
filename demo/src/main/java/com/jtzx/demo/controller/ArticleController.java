@@ -33,13 +33,14 @@ public class ArticleController {
         String username = userService.search(token);
         return new ResponseEntity<>(articleService.publish(article,username),HttpStatus.OK);
     }
-   //修改文章
+   /*修改文章，先判断token是否有效，
+   * 再判断请求者，是否为该文章的作者*/
     @RequestMapping("/alter")
     @ResponseBody
     public Object alter(@RequestBody Article article,@PathVariable Integer id,@RequestHeader("token") String token) {
        Article article1 = articleService.getArticle(id);
        String auther = article1.getAuthor();
-       Boolean is = userService.authentication(token,auther);
+       Boolean is = userService.authentication(token,auther);//判断用户名与作者是否同名
           if (is ) {
             articleService.altArticle(article, id);
           return "Updated Successfully!";
@@ -48,13 +49,14 @@ public class ArticleController {
           }
     }
 
-   //删除文章
+   /*删除文章,先判断token是否有效
+   * 再判断请求删除的用户，是否为该文章的作者*/
     @RequestMapping("/delete")
     @ResponseBody
     public Object delete(@PathVariable Integer id,@RequestHeader("token") String token) {
         Article article1 = articleService.getArticle(id);
         String auther = article1.getAuthor();
-        Boolean is = userService.authentication(token, auther);
+        Boolean is = userService.authentication(token, auther);//判断用户与作者是否同名
         if (is) {
             articleService.delArticle(id);
             return "Deleted Successfully!";
